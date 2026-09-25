@@ -30,7 +30,7 @@ number, or with anything still pending, fails validation).
 
 ## Also needed (shared with the Suppli Afya app)
 
-These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
+These are launch blockers in `suppli_afya-main_site/docs/DECISIONS.md` and apply here too:
 
 - **The catalogue is unverified.** Every product in the engine is `verified: false`; product pages say
   so until it's checked against the official BF Suma Kenya catalogue. Fix it upstream, then

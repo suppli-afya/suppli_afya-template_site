@@ -4,7 +4,7 @@
 
 A distributor's own page where customers get help choosing, see prices and order. Kate Cromuel's
 storefront is the first one and the reference for all others. Part of Suppli Afya
-(github.com/eddienjeru564-ship-it/suppli_afya); read that repo's `docs/BRAIN.md`, `docs/VOICE.md` and
+(github.com/suppli-afya/suppli_afya-main_site); read that repo's `docs/BRAIN.md`, `docs/VOICE.md` and
 `docs/ENGINE.md` before changing copy or anything the engine touches.
 
 Read before working here:
@@ -22,7 +22,7 @@ Read before working here:
   placeholder, listed in the storefront's `pending`.
 - No BF Suma logos or product photos. No fake testimonials, ratings, scarcity or countdowns.
 - No "AI", "smart", "quiz" or SaaS language in anything a customer reads. The customer voice is calm,
-  warm and plain (`suppli_afya/docs/VOICE.md`).
+  warm and plain (`suppli_afya-main_site/docs/VOICE.md`).
 - Components never name a distributor; everything comes from `src/storefronts/`. A test enforces it.
 - Preview storefronts never open a chat to a real number.
 

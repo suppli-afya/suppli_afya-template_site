@@ -13,7 +13,7 @@ Kate's identity  →  two ways in: "Help me choose" or "Browse products"
                  →  the order, written into WhatsApp for Kate to confirm
 ```
 
-It is part of Suppli Afya ([suppli_afya](https://github.com/eddienjeru564-ship-it/suppli_afya)): the
+It is part of Suppli Afya ([suppli_afya-main_site](https://github.com/suppli-afya/suppli_afya-main_site)): the
 same engine, the same safety rules, the same voice. Suppli Afya appears only as "Powered by" in the footer.
 
 ## Running it
@@ -31,7 +31,7 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 
 | Path | What it is |
 |---|---|
-| `src/engine/` | The recommendation engine: an **exact copy** of `suppli_afya/src/engine`, never edited here (see below) |
+| `src/engine/` | The recommendation engine: an **exact copy** of `suppli_afya-main_site/src/engine`, never edited here (see below) |
 | `src/storefronts/` | One file per distributor (`kate.ts`) and the registry (`index.ts`) |
 | `src/storefront/` | Pure logic: types, prices and order, product facts, messages, config validation. Tested |
 | `src/components/StorefrontPage.tsx` | The page, in story order |
@@ -51,17 +51,17 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 
 `src/engine/` is copied byte for byte from the Suppli Afya app and pinned in `engine.lock.json`
 (upstream commit and a hash per file). `npm test` fails if any engine file changes locally. To change
-the engine, change it in `suppli_afya`, then:
+the engine, change it in `suppli_afya-main_site`, then:
 
 ```bash
-npm run engine:sync                        # from ../suppli_afya
+npm run engine:sync                        # from ../suppli_afya-main_site
 npm run engine:sync -- --from <checkout>   # or from another checkout
 npm run engine:check                       # verify
 ```
 
 What this repo builds around the engine, and what it reuses:
 
-- The selector's driving logic follows `suppli_afya/src/components/check/HealthCheck.tsx`
+- The selector's driving logic follows `suppli_afya-main_site/src/components/check/HealthCheck.tsx`
   (next/back/finish, auto-advance, validation, answers in sessionStorage). Two presentation changes:
   the page itself replaces the engine's welcome screen (the privacy and "not medical advice" screen is
   still the first thing and still has to be accepted), and section screens become a header on the next
@@ -105,7 +105,18 @@ See `.env.example`.
 
 | Variable | Purpose |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links |
+| `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links. On Vercel it defaults to the deploy's own address |
 | `NEXT_PUBLIC_DEFAULT_STOREFRONT` | Which storefront `/` shows (default: the first) |
 | `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results the customer sends are filed as prospects via its `/api/leads` (live storefronts with `suppliSlug` only) |
 | `ORDER_WEBHOOK_URL` | Each order, re-priced on the server, is POSTed here as JSON (a sheet, a channel, or the portal later) |
+
+## Deploying
+
+The Vercel project is `suppli-afya-template-site`, linked to `suppli-afya/suppli_afya-template_site`.
+`vercel.json` runs its functions in Dublin (`dub1`), next to its own Supabase project.
+
+- **Its Supabase project is `suppli_afya-template_site`** (ref `aqnscgqcudjklburietu`, Ireland, `eu-west-1`).
+  It is empty on purpose: today a storefront keeps nothing on a server (see `/privacy`). Tables go there only
+  once storing orders server-side is decided, together with an update to the privacy page.
+- **Never connect this storefront to the main app's database** (`suppli_afya_main_site`). The storefront reaches
+  the app only through its public API, at `SUPPLI_AFYA_URL`.
