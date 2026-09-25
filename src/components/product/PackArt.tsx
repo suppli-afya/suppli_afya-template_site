@@ -12,7 +12,7 @@ import { FORMAT_LABEL, shortName } from "@/storefront/products";
  * Everything is sized in container units of the stage's shorter side (cqmin), so one
  * component works as a 64px thumbnail, a tall card and a wide banner without cropping.
  */
-export const LINE_TONE: Record<ProductLine, string> = {
+const LINE_TONE: Record<ProductLine, string> = {
   "Immune Booster": "#5b4636",
   "Heart & Blood Fit": "#7a2e33",
   "Sport Fit": "#a86f22",
@@ -104,7 +104,8 @@ function Label({ product, compact }: { product: Product; compact?: boolean }) {
   const size = name.length > 22 ? "text-[4.4cqmin]" : name.length > 13 ? (compact ? "text-[4.6cqmin]" : "text-[5.2cqmin]") : compact ? "text-[5.2cqmin]" : "text-[6.4cqmin]";
   return (
     <div className="flex h-full flex-col items-center justify-center px-[3cqmin] text-center">
-      <span className="text-[2.9cqmin] font-semibold uppercase leading-none tracking-[0.14em] text-[var(--tone)] opacity-80">
+      {/* The line's tint, deepened so even the lighter tones read on the paper label. */}
+      <span className="text-[2.9cqmin] font-semibold uppercase leading-none tracking-[0.14em] text-[color-mix(in_oklab,var(--tone)_80%,black)]">
         {product.line}
       </span>
       <span
