@@ -7,7 +7,7 @@ import { retryPending } from "@/server/portal";
  * goes out: orders the portal couldn't take when they were placed are sent again. Needs CRON_SECRET.
  */
 export async function GET(req: Request) {
-  const secret = process.env.CRON_SECRET ?? "";
+  const secret = process.env.CRON_SECRET || "";
   const given = Buffer.from(req.headers.get("authorization") ?? "");
   const expected = Buffer.from(`Bearer ${secret}`);
   if (!secret || given.length !== expected.length || !timingSafeEqual(given, expected)) {
