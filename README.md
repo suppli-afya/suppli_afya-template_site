@@ -115,6 +115,7 @@ See `.env.example`.
 | `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links. On Vercel it defaults to the deploy's own address |
 | `NEXT_PUBLIC_DEFAULT_STOREFRONT` | Which storefront `/` shows (default: the first) |
 | `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results are filed as prospects (`/api/leads`) and orders in the portal (`/api/storefront/orders`); live storefronts with `suppliSlug` only |
+| `NEXT_PUBLIC_SUPPLI_AFYA_SITE` | Where "Powered by Suppli Afya" links. Defaults to `SUPPLI_AFYA_URL`, then `https://suppliafya.co.ke` |
 | `STOREFRONT_SECRET` | Shared with the app (same value there). Orders are only filed with it |
 | `DATABASE_URL` | This storefront's own database, holding orders waiting for the portal. Optional; see "Deploying" |
 | `CRON_SECRET` | Protects `/api/cron/orders`, which sends waiting orders every morning (see `vercel.json`) |
