@@ -28,22 +28,6 @@ export function ChevronLeft({ className }: P) {
   );
 }
 
-export function ChevronRight({ className }: P) {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
-      <path d="M6 3.5 10.5 8 6 12.5" strokeWidth="1.7" {...stroke} />
-    </svg>
-  );
-}
-
-export function ChevronDown({ className }: P) {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
-      <path d="M3.5 6 8 10.5 12.5 6" strokeWidth="1.7" {...stroke} />
-    </svg>
-  );
-}
-
 export function ArrowRight({ className }: P) {
   return (
     <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
@@ -159,14 +143,6 @@ export function Tag({ className }: P) {
   );
 }
 
-export function Chat({ className }: P) {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden className={clsx("h-5 w-5", className)}>
-      <path d="M4 4.5h12a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H9l-4 3v-3H4A1.5 1.5 0 0 1 2.5 13V6A1.5 1.5 0 0 1 4 4.5Z" strokeWidth="1.4" {...stroke} />
-    </svg>
-  );
-}
-
 export function Phone({ className }: P) {
   return (
     <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
@@ -188,15 +164,6 @@ export function Copy({ className }: P) {
     <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
       <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" strokeWidth="1.4" {...stroke} />
       <path d="M10.5 3.5v-.3c0-.8-.6-1.2-1.3-1.2H3.8c-.8 0-1.3.5-1.3 1.3v5.4c0 .7.5 1.3 1.2 1.3h.3" strokeWidth="1.4" {...stroke} />
-    </svg>
-  );
-}
-
-export function Clock({ className }: P) {
-  return (
-    <svg viewBox="0 0 16 16" aria-hidden className={clsx("h-4 w-4", className)}>
-      <circle cx="8" cy="8" r="6" strokeWidth="1.4" {...stroke} />
-      <path d="M8 4.8V8l2.2 1.6" strokeWidth="1.4" {...stroke} />
     </svg>
   );
 }

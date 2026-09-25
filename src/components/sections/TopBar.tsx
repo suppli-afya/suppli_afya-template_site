@@ -91,7 +91,8 @@ export function TopBar() {
 
 /**
  * Shown only while a storefront is in preview, so a template value is never mistaken for a
- * fact. One line; the list of what's still a placeholder opens on tap.
+ * fact. A short sentence that wraps like one on small phones (a flex row broke it into columns);
+ * the list of what's still a placeholder opens on tap.
  */
 export function PreviewRibbon() {
   const { sf } = useStorefront();
@@ -100,11 +101,11 @@ export function PreviewRibbon() {
   const joined = list.length > 1 ? `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}` : list[0];
   return (
     <details className="group bg-night text-[0.75rem] leading-snug text-white/70">
-      <summary className="flex cursor-pointer list-none items-center justify-center gap-1.5 px-4 py-2 text-center [&::-webkit-details-marker]:hidden">
+      <summary className="block cursor-pointer list-none px-4 py-2 text-center [&::-webkit-details-marker]:hidden">
         <span className="font-semibold text-white">Preview of {sf.distributor.firstName}&apos;s page</span>
-        <span aria-hidden>·</span>
-        <span>some details are placeholders</span>
-        <span className="underline underline-offset-2 group-open:hidden">Which?</span>
+        <span aria-hidden> · </span>
+        <span>some details are placeholders</span>{" "}
+        <span className="whitespace-nowrap underline underline-offset-2 group-open:hidden">Which?</span>
       </summary>
       <p className="px-4 pb-2.5 text-center">
         {joined.charAt(0).toUpperCase() + joined.slice(1)} are placeholders until they&apos;re confirmed.

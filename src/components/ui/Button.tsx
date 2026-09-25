@@ -36,7 +36,7 @@ export function buttonClass(variant: Variant = "primary", size: Size = "md", cla
   return clsx(base, variants[variant], sizes[size], className);
 }
 
-export function Arrow({ className }: { className?: string }) {
+function Arrow({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -78,29 +78,5 @@ export function ButtonLink({
       {children}
       {arrow && <Arrow />}
     </a>
-  );
-}
-
-/** Round icon-only button. Always give it an aria-label. */
-export function IconButton({
-  className,
-  children,
-  tone = "plain",
-  ...rest
-}: { tone?: "plain" | "night" | "solid"; children: ReactNode } & ComponentProps<"button">) {
-  return (
-    <button
-      type="button"
-      className={clsx(
-        "grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors duration-200",
-        tone === "plain" && "text-ink hover:bg-ink/[0.06]",
-        tone === "night" && "text-white hover:bg-white/10",
-        tone === "solid" && "bg-surface text-ink shadow-lift hover:bg-white",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </button>
   );
 }

@@ -8,7 +8,7 @@ import { kes } from "@/storefront/money";
 import { PAYMENT_LABEL } from "@/storefront/order";
 import type { Storefront } from "@/storefront/types";
 
-export function paymentPhrase(sf: Storefront): string {
+function paymentPhrase(sf: Storefront): string {
   const m = sf.payment.methods.map((x) => (x === "cash" ? "cash on delivery" : PAYMENT_LABEL[x]));
   return m.length > 1 ? `${m.slice(0, -1).join(", ")} or ${m[m.length - 1]}` : (m[0] ?? "");
 }

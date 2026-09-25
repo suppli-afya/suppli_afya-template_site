@@ -15,10 +15,19 @@ function publicUrl() {
 }
 const SITE_URL = publicUrl();
 
+/**
+ * Where "Powered by Suppli Afya" in the footer links. Until Suppli Afya has its own domain, the app
+ * this deploy files orders with (SUPPLI_AFYA_URL) is the address that's actually live.
+ */
+const SUPPLI_AFYA_SITE = process.env.NEXT_PUBLIC_SUPPLI_AFYA_SITE || process.env.SUPPLI_AFYA_URL;
+
 const nextConfig: NextConfig = {
   // The database driver loads at runtime; keep it out of the bundle.
   serverExternalPackages: ["postgres"],
-  env: SITE_URL ? { NEXT_PUBLIC_SITE_URL: SITE_URL } : {},
+  env: {
+    ...(SITE_URL ? { NEXT_PUBLIC_SITE_URL: SITE_URL } : {}),
+    ...(SUPPLI_AFYA_SITE ? { NEXT_PUBLIC_SUPPLI_AFYA_SITE: SUPPLI_AFYA_SITE } : {}),
+  },
   async headers() {
     return [
       {
