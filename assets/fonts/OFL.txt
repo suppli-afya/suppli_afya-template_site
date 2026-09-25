@@ -1,0 +1,5 @@
+Newsreader and Hanken Grotesk are licensed under the SIL Open Font License, Version 1.1.
+Newsreader: Copyright 2020 The Newsreader Project Authors (https://github.com/productiontype/Newsreader)
+Hanken Grotesk: Copyright 2021 The Hanken Grotesk Project Authors (https://github.com/marcologous/hanken-grotesk)
+Full licence text: https://openfontlicense.org/open-font-license-official-text/
+These latin subsets are used only to render social preview images.
