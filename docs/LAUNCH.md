@@ -23,14 +23,14 @@ else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`,
 | One or two sentences in her own words | `distributor.intro` | About the customer, not about her. No credentials we can't check |
 | Languages, reply hours (optional) | `distributor.languages`, `distributor.hours` | |
 | Her colour (optional) | `theme` | Tests check white text is readable on it |
-| Her Suppli Afya link name | `suppliSlug` | Once she has a workspace, so sent results reach her portal |
+| Her Suppli Afya link name | `suppliSlug` | Once she has a workspace, so sent results and orders reach her portal |
 
 Then set `pending: []` and `status: "live"`, and run `npm test` (a live storefront without a WhatsApp
 number, or with anything still pending, fails validation).
 
 ## Also needed (shared with the Suppli Afya app)
 
-These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
+These are launch blockers in `suppli_afya-main_site/docs/DECISIONS.md` and apply here too:
 
 - **The catalogue is unverified.** Every product in the engine is `verified: false`; product pages say
   so until it's checked against the official BF Suma Kenya catalogue. Fix it upstream, then
@@ -43,5 +43,6 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
 
 ## Deploying
 
-A standard Next.js app (Vercel or any Node host). Set `NEXT_PUBLIC_SITE_URL` to the public address so
-link previews work in WhatsApp, and `NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` if `/` should be Kate's page.
+A standard Next.js app on Vercel (see the README, "Deploying"). `NEXT_PUBLIC_SITE_URL` defaults to the deploy's
+own address; set it once Kate's page has its own domain. Set `NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` if `/` should
+be Kate's page.

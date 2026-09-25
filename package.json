@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "engine:sync": "node scripts/engine.mjs sync",
@@ -17,10 +17,12 @@
     "clsx": "^2.1.1",
     "motion": "^13.4.2",
     "next": "16.3.6",
+    "postgres": "^3.4.9",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "1.56",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.20.4",

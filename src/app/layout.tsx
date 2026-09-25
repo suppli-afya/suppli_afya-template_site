@@ -18,7 +18,7 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   applicationName: "Suppli Afya",
   // Phone numbers are shown and linked on purpose; stop iOS turning every number into a link.
   formatDetection: { telephone: false },

@@ -2,7 +2,7 @@
 
 /*
  * Answer inputs for the selector. Ported from the Suppli Afya health check
- * (suppli_afya: src/components/check/inputs.tsx): same roles, keyboard behaviour and
+ * (suppli_afya-main_site: src/components/check/inputs.tsx): same roles, keyboard behaviour and
  * option logic, restyled with the storefront's tokens so the accent is the distributor's.
  */
 

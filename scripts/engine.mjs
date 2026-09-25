@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * The recommendation engine is owned by the Suppli Afya app
- * (github.com/eddienjeru564-ship-it/suppli_afya, src/engine/). This repository
+ * (github.com/suppli-afya/suppli_afya-main_site, src/engine/). This repository
  * keeps an exact copy in src/engine/ and never edits it.
  *
  *   npm run engine:check              verify src/engine/ matches engine.lock.json
- *   npm run engine:sync               copy the engine from ../suppli_afya and update the lock
- *   npm run engine:sync -- --from DIR copy from another checkout of suppli_afya
+ *   npm run engine:sync               copy the engine from ../suppli_afya-main_site and update the lock
+ *   npm run engine:sync -- --from DIR copy from another checkout of suppli_afya-main_site
  *
  * `npm test` runs the same check, so a local edit to the engine fails CI.
  * To change the engine, change it upstream, then sync.
@@ -41,7 +41,7 @@ export function engineDrift() {
 function sync(from) {
   const source = join(from, "src/engine");
   if (!existsSync(source)) {
-    console.error(`No engine found at ${source}. Pass --from <path to a suppli_afya checkout>.`);
+    console.error(`No engine found at ${source}. Pass --from <path to a suppli_afya-main_site checkout>.`);
     process.exit(1);
   }
   for (const f of tsFiles(ENGINE_DIR)) rmSync(join(ENGINE_DIR, f));
@@ -57,7 +57,7 @@ function sync(from) {
     /* not a git checkout */
   }
   const lock = {
-    upstream: "github.com/eddienjeru564-ship-it/suppli_afya",
+    upstream: "github.com/suppli-afya/suppli_afya-main_site",
     path: "src/engine",
     commit,
     syncedAt: new Date().toISOString().slice(0, 10),
@@ -72,7 +72,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const [cmd, ...rest] = process.argv.slice(2);
   if (cmd === "sync") {
     const i = rest.indexOf("--from");
-    const from = resolve(ROOT, i >= 0 ? rest[i + 1] : process.env.SUPPLI_AFYA_DIR ?? "../suppli_afya");
+    const from = resolve(ROOT, i >= 0 ? rest[i + 1] : process.env.SUPPLI_AFYA_DIR ?? "../suppli_afya-main_site");
     sync(from);
   } else if (cmd === "check") {
     const problems = engineDrift();
@@ -83,7 +83,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     }
     console.log("Engine matches the upstream copy.");
   } else {
-    console.log("Usage: node scripts/engine.mjs <check|sync> [--from <suppli_afya checkout>]");
+    console.log("Usage: node scripts/engine.mjs <check|sync> [--from <suppli_afya-main_site checkout>]");
     process.exit(1);
   }
 }

@@ -1,8 +1,8 @@
 {
-  "upstream": "github.com/eddienjeru564-ship-it/suppli_afya",
+  "upstream": "github.com/suppli-afya/suppli_afya-main_site",
   "path": "src/engine",
-  "commit": "fe1b13d6ab213416556a5bacb8570b18765ad4f4",
-  "syncedAt": "2026-09-24",
+  "commit": "fc13ece0570fa109165ddb3c8130d10965be608f",
+  "syncedAt": "2026-09-25",
   "note": "Exact copy of the Suppli Afya engine. Do not edit here; change it upstream and run npm run engine:sync.",
   "files": {
     "advice.ts": "ea5fa3e7bdfc607dc95727f1aa9f3018a9a1462652169305ced2e8d0c0532c4e",

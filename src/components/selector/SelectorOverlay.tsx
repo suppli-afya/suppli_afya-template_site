@@ -31,7 +31,7 @@ import { SoFar } from "./SoFar";
  *
  * The engine decides everything (which questions, in which order, what counts as answered,
  * what's recommended). This component only renders it. The driving logic follows the Suppli
- * Afya health check (suppli_afya: src/components/check/HealthCheck.tsx) with two
+ * Afya health check (suppli_afya-main_site: src/components/check/HealthCheck.tsx) with two
  * presentation changes for a storefront:
  *   - The engine's welcome screen is replaced by the page itself; the flow opens on its
  *     privacy and "not medical advice" screen, which still has to be accepted.
