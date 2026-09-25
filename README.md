@@ -130,7 +130,7 @@ The Vercel project is `suppli-afya-template-site`, linked to `suppli-afya/suppli
   storefront creates it on first connect from `src/server/schema.ts`.
 - **Its own database user.** The storefront connects as `storefront_app`, not `postgres`, through the transaction
   pooler (port 6543, which Vercel needs):
-  `postgres://storefront_app.aqnscgqcudjklburietu:PASSWORD@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require`.
+  `postgres://storefront_app.aqnscgqcudjklburietu:PASSWORD@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require`.
   It owns its tables and can't bypass row level security. Every table has RLS on with no policies and Supabase's
   Data API roles hold no grants, so nothing is readable through the API; `src/server/portal.test.ts` checks this.
   To rotate the password: `alter role storefront_app password '…'` in the SQL editor, then update `DATABASE_URL`
