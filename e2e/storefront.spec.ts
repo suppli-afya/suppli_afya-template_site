@@ -32,6 +32,12 @@ test("browsing: find a product, read about it and send the order to the distribu
   await next(page, /Send order to Kate/);
   await expect(sheet(page).getByRole("alert")).toHaveText("Add your name so Kate knows who the order is from.");
   await sheet(page).getByLabel("Your name").fill("Wanjiru");
+  await next(page, /Send order to Kate/);
+  await expect(sheet(page).getByRole("alert")).toHaveText("Add your phone number so Kate can reach you about the order.");
+  await sheet(page).getByLabel("Your phone number").fill("0712 34");
+  await next(page, /Send order to Kate/);
+  await expect(sheet(page).getByRole("alert")).toHaveText("That phone number doesn't look right. Try it like 0712 345 678.");
+  await sheet(page).getByLabel("Your phone number").fill("0712 345 678");
   await pick(page, /^Within Nairobi/);
   await pick(page, "M-Pesa");
   await next(page, /Send order to Kate/);
@@ -41,6 +47,7 @@ test("browsing: find a product, read about it and send the order to the distribu
   await expect(message.getByText("Hi Kate, I'd like to order from your page.")).toBeVisible();
   await expect(message.getByText("1 × Probio3 · KES 3,900")).toBeVisible();
   await expect(message.getByText(/Within Nairobi \(delivery cost to confirm\)/)).toBeVisible();
+  await expect(message.getByText(/Phone: 0712 345 678/)).toBeVisible();
   await expect(message.getByText(/Order ref: KC-[A-Z2-9]{4}/)).toBeVisible();
   await message.getByRole("button", { name: "Done" }).click();
   await expect(sheet(page).getByRole("heading", { name: "Now press send in WhatsApp." })).toBeVisible();
@@ -181,14 +188,14 @@ test("small phones: nothing is wider than the screen, on the page or in a sheet"
 });
 
 test.describe("order API", () => {
-  const details = { name: "Wanjiru", receive: "delivery", areaId: "nairobi", payment: "mpesa" };
+  const details = { name: "Wanjiru", phone: "0712 345 678", receive: "delivery", areaId: "nairobi", payment: "mpesa" };
 
   test("prices come from the price list, never from the browser", async ({ request }) => {
     const res = await request.post("/api/orders", {
       data: { slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 2, price: 1 }], details },
     });
     expect(res.ok()).toBe(true);
-    expect(await res.json()).toMatchObject({ ok: true, ref: "KC-AB23", total: 7800, totalConfirmed: false, forwarded: false });
+    expect(await res.json()).toMatchObject({ ok: true, ref: "KC-AB23", total: 7800, totalConfirmed: false, filed: false, forwarded: false });
   });
 
   test("turns away orders that can't be right", async ({ request }) => {
@@ -196,6 +203,7 @@ test.describe("order API", () => {
     expect((await post({ slug: "nobody", ref: "KC-AB23", items: [], details })).status()).toBe(404);
     expect((await post({ slug: "kate", ref: "nope", items: [{ id: "probio3", qty: 1 }], details })).status()).toBe(400);
     expect((await post({ slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 1 }], details: { ...details, name: "" } })).status()).toBe(422);
+    expect((await post({ slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 1 }], details: { ...details, phone: "12" } })).status()).toBe(422);
     expect((await post({ slug: "kate", ref: "KC-AB23", items: [{ id: "not-sold", qty: 1 }], details })).status()).toBe(422);
   });
 

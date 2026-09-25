@@ -34,9 +34,11 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-[1.5rem] text-ink">Orders</h2>
           <p className="mt-2">
-            When you send an order, it opens in WhatsApp with the products, your name and the delivery details you entered, and
-            the distributor receives it when you press send. The distributor may keep a record of it to deliver and to follow
-            up. This page remembers what&apos;s in your order, your name and your delivery choice on this device, so you
+            When you send an order, it opens in WhatsApp with the products, your name, your phone number and the delivery
+            details you entered, and the distributor receives it when you press send. If the distributor uses a Suppli Afya
+            workspace, the order is also saved there so they can deliver it and follow up. If that can&apos;t happen straight
+            away, the order waits on this page&apos;s server and is tried again for up to seven days, then deleted. This page
+            remembers what&apos;s in your order, your name, your phone number and your delivery choice on this device, so you
             don&apos;t have to type them again. Clearing your browser&apos;s data removes them.
           </p>
         </section>

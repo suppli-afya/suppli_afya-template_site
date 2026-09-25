@@ -42,7 +42,8 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 | `src/components/whatsapp/` | Every chat with the distributor goes through here |
 | `src/components/store/` | Page state: the order, overlays (kept in the URL), selector session, toasts |
 | `src/components/ui/` | Buttons, icons, the sheet primitive |
-| `src/app/api/` | `leads` (forwards selector results to the Suppli Afya app) and `orders` (re-prices, optional webhook) |
+| `src/app/api/` | `leads` (forwards selector results to the Suppli Afya app), `orders` (re-prices, files in the portal, optional webhook) and `cron/orders` (sends orders still waiting) |
+| `src/server/` | The storefront's own database and schema, and filing orders in the portal (`portal.ts`) |
 | `e2e/` | Playwright: both customer paths, safety, links and the back button, small phones, the order API |
 | `docs/DESIGN.md` | The design system and why each screen looks the way it does |
 | `docs/LAUNCH.md` | What Kate needs to give us before her page goes live |
@@ -99,6 +100,12 @@ order is complete and priced on the page, then written into WhatsApp with a refe
 distributor confirms stock, delivery and the total, and the customer pays them directly. The order sheet
 remembers the customer's details on their phone and offers "Order the same again" next time.
 
+On a live storefront with a `suppliSlug`, the server also files the order in the distributor's Suppli Afya
+portal (`src/server/portal.ts`): it lands in their Orders and on Today, with the customer, so reorder reminders
+work. The customer's phone number is asked for because of this (and for delivery). If the portal can't take the
+order right away, it waits in this storefront's own database and is sent again the next time the portal
+answers, or by the morning job (`/api/cron/orders`). It's deleted once filed, and after 7 days regardless.
+
 ## Configuration
 
 See `.env.example`.
@@ -107,8 +114,11 @@ See `.env.example`.
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links. On Vercel it defaults to the deploy's own address |
 | `NEXT_PUBLIC_DEFAULT_STOREFRONT` | Which storefront `/` shows (default: the first) |
-| `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results the customer sends are filed as prospects via its `/api/leads` (live storefronts with `suppliSlug` only) |
-| `ORDER_WEBHOOK_URL` | Each order, re-priced on the server, is POSTed here as JSON (a sheet, a channel, or the portal later) |
+| `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results are filed as prospects (`/api/leads`) and orders in the portal (`/api/storefront/orders`); live storefronts with `suppliSlug` only |
+| `STOREFRONT_SECRET` | Shared with the app (same value there). Orders are only filed with it |
+| `DATABASE_URL` | This storefront's own database, holding orders waiting for the portal. Optional; see "Deploying" |
+| `CRON_SECRET` | Protects `/api/cron/orders`, which sends waiting orders every morning (see `vercel.json`) |
+| `ORDER_WEBHOOK_URL` | Each order, re-priced on the server, is POSTed here as JSON (a sheet, a channel) |
 
 ## Deploying
 
@@ -116,7 +126,14 @@ The Vercel project is `suppli-afya-template-site`, linked to `suppli-afya/suppli
 `vercel.json` runs its functions in Dublin (`dub1`), next to its own Supabase project.
 
 - **Its Supabase project is `suppli_afya-template_site`** (ref `aqnscgqcudjklburietu`, Ireland, `eu-west-1`).
-  It is empty on purpose: today a storefront keeps nothing on a server (see `/privacy`). Tables go there only
-  once storing orders server-side is decided, together with an update to the privacy page.
+  It holds one table, `pending_orders`: orders waiting for the portal, deleted once filed or after 7 days. The
+  storefront creates it on first connect from `src/server/schema.ts`.
+- **Its own database user.** The storefront connects as `storefront_app`, not `postgres`, through the transaction
+  pooler (port 6543, which Vercel needs):
+  `postgres://storefront_app.aqnscgqcudjklburietu:PASSWORD@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require`.
+  It owns its tables and can't bypass row level security. Every table has RLS on with no policies and Supabase's
+  Data API roles hold no grants, so nothing is readable through the API; `src/server/portal.test.ts` checks this.
+  To rotate the password: `alter role storefront_app password '…'` in the SQL editor, then update `DATABASE_URL`
+  in Vercel and redeploy.
 - **Never connect this storefront to the main app's database** (`suppli_afya_main_site`). The storefront reaches
   the app only through its public API, at `SUPPLI_AFYA_URL`.

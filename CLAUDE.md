@@ -31,7 +31,9 @@ Read before working here:
 - `src/storefronts/`: one config per distributor, and the registry
 - `src/storefront/`: pure, tested logic (prices, orders, product facts, messages, validation)
 - `src/components/`: sections, selector, product, order, WhatsApp, the sheet primitive, page state
-- `src/app/`: `/`, `/[slug]`, link preview image, icon, privacy, `api/leads`, `api/orders`
+- `src/app/`: `/`, `/[slug]`, link preview image, icon, privacy, `api/leads`, `api/orders`, `api/cron/orders`
+- `src/server/`: the storefront's own database (Supabase `suppli_afya-template_site`, never the app's) and filing
+  orders in the distributor's portal, with a queue for orders the portal couldn't take yet
 - `e2e/`: Playwright tests (desktop and phone)
 
 ## Commands

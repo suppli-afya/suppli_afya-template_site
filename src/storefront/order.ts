@@ -11,6 +11,8 @@ import type { DeliveryArea, PaymentMethod, Storefront } from "./types";
 
 export interface OrderDetails {
   name: string;
+  /** The customer's mobile number, as typed. For delivery, and so the distributor can reach them. */
+  phone: string;
   receive: "delivery" | "pickup";
   areaId: string | null;
   /** Street, building or landmark. */
@@ -24,7 +26,7 @@ export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   cash: "Cash",
 };
 
-export const LIMITS = { name: 40, address: 160, note: 280 } as const;
+export const LIMITS = { name: 40, phone: 20, address: 160, note: 280 } as const;
 
 export function receiveModes(sf: Storefront): OrderDetails["receive"][] {
   const modes: OrderDetails["receive"][] = [];
@@ -38,6 +40,7 @@ export function emptyDetails(sf: Storefront): OrderDetails {
   const areas = sf.fulfilment.delivery?.areas ?? [];
   return {
     name: "",
+    phone: "",
     receive: modes[0] ?? "delivery",
     areaId: areas.length === 1 ? areas[0].id : null,
     address: "",
@@ -51,6 +54,8 @@ export function detailsProblem(sf: Storefront, d: OrderDetails): string | null {
   const name = d.name.trim();
   if (name.length < 2) return "Add your name so " + sf.distributor.firstName + " knows who the order is from.";
   if (name.length > LIMITS.name) return "That name is a little long. A first name is fine.";
+  if (!d.phone.trim()) return "Add your phone number so " + sf.distributor.firstName + " can reach you about the order.";
+  if (!normaliseKenyanPhone(d.phone)) return "That phone number doesn't look right. Try it like 0712 345 678.";
   if (!receiveModes(sf).includes(d.receive)) return "Choose how you'd like to get your order.";
   if (d.receive === "delivery" && !sf.fulfilment.delivery?.areas.some((a) => a.id === d.areaId))
     return "Choose where it should be delivered.";
@@ -104,6 +109,19 @@ export function newOrderRef(distributorName: string, random: () => number = Math
   return `${initials(distributorName)}-${code}`;
 }
 
+/** 07XX / 01XX / +2547XX → 2547XXXXXXXX (the Suppli Afya app's format). null if it isn't a Kenyan mobile number. */
+export function normaliseKenyanPhone(input: string): string | null {
+  const d = input.replace(/[^\d+]/g, "").replace(/^\+/, "");
+  const m = d.match(/^(?:254|0)?([17]\d{8})$/);
+  return m ? `254${m[1]}` : null;
+}
+
+/** 254712345678 → "0712 345 678", the way people here write it. */
+export function formatKenyanPhone(normalised: string): string {
+  const local = `0${normalised.slice(3)}`;
+  return `${local.slice(0, 4)} ${local.slice(4, 7)} ${local.slice(7)}`;
+}
+
 /** The WhatsApp message that carries the order, in the customer's voice. */
 export function orderMessage(
   sf: Storefront,
@@ -125,6 +143,8 @@ export function orderMessage(
   }
   lines.push("");
   lines.push(`*Name:* ${d.name.trim()}`);
+  const phone = normaliseKenyanPhone(d.phone);
+  if (phone) lines.push(`*Phone:* ${formatKenyanPhone(phone)}`);
   if (d.receive === "delivery" && d.address.trim()) lines.push(`*Deliver to:* ${oneLine(d.address)}`);
   if (d.payment) lines.push(`*Paying by:* ${PAYMENT_LABEL[d.payment]}`);
   if (d.note.trim()) lines.push(`*Note:* ${oneLine(d.note)}`);
@@ -146,6 +166,7 @@ export function parseDetails(raw: unknown): OrderDetails {
   const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
   return {
     name: str(r.name, LIMITS.name + 10),
+    phone: str(r.phone, LIMITS.phone + 10),
     receive: r.receive === "pickup" ? "pickup" : "delivery",
     areaId: typeof r.areaId === "string" ? r.areaId.slice(0, 40) : null,
     address: str(r.address, LIMITS.address + 10),
@@ -161,7 +182,7 @@ export function orderRecord(sf: Storefront, order: PricedOrder, d: OrderDetails,
     distributor: sf.distributor.name,
     ref: refs.order,
     selectorRef: refs.selector ?? null,
-    customer: { name: d.name.trim() },
+    customer: { name: d.name.trim(), phone: normaliseKenyanPhone(d.phone) },
     receive: d.receive,
     deliverTo: d.receive === "delivery" ? { area: order.delivery?.label ?? null, address: oneLine(d.address) || null } : null,
     payment: d.payment,
@@ -175,3 +196,26 @@ export function orderRecord(sf: Storefront, order: PricedOrder, d: OrderDetails,
     message: orderMessage(sf, order, d, refs),
   };
 }
+
+type OrderRecord = ReturnType<typeof orderRecord>;
+
+/**
+ * What the Suppli Afya app's /api/storefront/orders takes: the order, re-priced here, filed in
+ * the distributor's portal under their link name. Only what the portal uses; the WhatsApp text stays out.
+ */
+export function portalOrder(record: OrderRecord, suppliSlug: string) {
+  return {
+    suppliSlug,
+    ref: record.ref,
+    selectorRef: record.selectorRef,
+    customer: record.customer,
+    receive: record.receive,
+    deliverTo: record.deliverTo,
+    payment: record.payment,
+    note: record.note,
+    lines: record.lines,
+    total: record.total,
+    totalConfirmed: record.totalConfirmed,
+  };
+}
+export type PortalOrder = ReturnType<typeof portalOrder>;

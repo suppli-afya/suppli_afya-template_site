@@ -12,9 +12,14 @@ import {
   ORDER_REF,
   detailsProblem,
   emptyDetails,
+  formatKenyanPhone,
   initials,
   newOrderRef,
+  normaliseKenyanPhone,
   orderMessage,
+  orderRecord,
+  parseDetails,
+  portalOrder,
   priceOrder,
   type OrderDetails,
 } from "./order";
@@ -196,14 +201,16 @@ describe("orders", () => {
     { id: "probio3", qty: 1, from: "selector" },
     { id: "veggie-veggie", qty: 2 },
   ];
-  const details: OrderDetails = { ...emptyDetails(live), name: " Wanjiru ", receive: "delivery", areaId: "cbd", address: "Kilimani,\nnear Yaya", payment: "mpesa", note: "" };
+  const details: OrderDetails = { ...emptyDetails(live), name: " Wanjiru ", phone: "0712 345 678", receive: "delivery", areaId: "cbd", address: "Kilimani,\nnear Yaya", payment: "mpesa", note: "" };
 
   it("asks for what's missing, one thing at a time", () => {
     expect(detailsProblem(live, { ...details, name: "" })).toMatch(/Add your name so Amani/);
+    expect(detailsProblem(live, { ...details, phone: " " })).toMatch(/Add your phone number so Amani/);
+    expect(detailsProblem(live, { ...details, phone: "12345" })).toMatch(/doesn't look right/);
     expect(detailsProblem(live, { ...details, areaId: null })).toMatch(/delivered/);
     expect(detailsProblem(live, { ...details, payment: null })).toMatch(/pay/);
     expect(detailsProblem(live, { ...details, receive: "pickup", areaId: null })).toBeNull();
-    expect(detailsProblem(kate, { ...emptyDetails(kate), name: "Wanjiru", receive: "pickup" })).toMatch(/how you'd like to get/);
+    expect(detailsProblem(kate, { ...emptyDetails(kate), name: "Wanjiru", phone: "0712345678", receive: "pickup" })).toMatch(/how you'd like to get/);
     expect(detailsProblem(live, details)).toBeNull();
   });
 
@@ -228,6 +235,7 @@ describe("orders", () => {
     expect(msg).toContain("*Delivery:* Nairobi CBD · KES 200");
     expect(msg).toContain("*Total:* KES 12,300");
     expect(msg).toContain("*Name:* Wanjiru");
+    expect(msg).toContain("*Phone:* 0712 345 678");
     expect(msg).toContain("*Deliver to:* Kilimani, near Yaya");
     expect(msg).toContain("*Paying by:* M-Pesa");
     expect(msg).toContain("Order ref: AO-7QX2 · Selector ref: SA-AB12");
@@ -245,6 +253,38 @@ describe("orders", () => {
     expect(ref).toMatch(ORDER_REF);
     expect(ref.startsWith("KC-")).toBe(true);
     for (let n = 0; n < 200; n++) expect(newOrderRef("Kate Cromuel")).toMatch(ORDER_REF);
+  });
+
+  it("reads phone numbers the way people type them", () => {
+    for (const typed of ["0712 345 678", "0712345678", "+254 712 345 678", "254712345678", "712345678"])
+      expect(normaliseKenyanPhone(typed)).toBe("254712345678");
+    expect(normaliseKenyanPhone("0110 123 456")).toBe("254110123456");
+    for (const wrong of ["", "12345", "0812 345 678", "+1 415 555 0100"]) expect(normaliseKenyanPhone(wrong)).toBeNull();
+    expect(formatKenyanPhone("254712345678")).toBe("0712 345 678");
+  });
+
+  it("files in the portal exactly what the Suppli Afya app takes", () => {
+    const d = parseDetails({ ...details, phone: "+254 712 345 678", note: "Evenings\nare best" });
+    const record = orderRecord(live, priceOrder(live, cart, d), d, { order: "AO-7QX2", selector: "SA-AB12" });
+    const body = portalOrder(record, "amani");
+    // The fields suppli_afya-main_site's /api/storefront/orders reads, and nothing else.
+    expect(body).toEqual({
+      suppliSlug: "amani",
+      ref: "AO-7QX2",
+      selectorRef: "SA-AB12",
+      customer: { name: "Wanjiru", phone: "254712345678" },
+      receive: "delivery",
+      deliverTo: { area: "Nairobi CBD", address: "Kilimani, near Yaya" },
+      payment: "mpesa",
+      note: "Evenings are best",
+      lines: [
+        { id: "probio3", name: "Probio3", qty: 1, unitPrice: 3900, total: 3900 },
+        { id: "veggie-veggie", name: "Veggie Veggie", qty: 2, unitPrice: 4100, total: 8200 },
+      ],
+      total: 12300,
+      totalConfirmed: true,
+    });
+    expect(JSON.stringify(body)).not.toContain("Hi Amani");
   });
 });
 

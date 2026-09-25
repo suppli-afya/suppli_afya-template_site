@@ -297,6 +297,24 @@ function Details({
             />
           </Field>
 
+          <Field label="Your phone number" htmlFor={`${id}-phone`}>
+            <input
+              id={`${id}-phone`}
+              type="tel"
+              inputMode="tel"
+              value={details.phone}
+              onChange={(e) => set({ phone: e.target.value })}
+              autoComplete="tel"
+              maxLength={LIMITS.phone}
+              placeholder="07XX XXX XXX"
+              aria-describedby={`${id}-phone-why`}
+              className={inputClass}
+            />
+            <p id={`${id}-phone-why`} className="mt-1.5 text-[0.8rem] text-ink-3">
+              For delivery, and so {first} can reach you about this order.
+            </p>
+          </Field>
+
           {modes.length > 1 && (
             <Field label="How would you like to get it?">
               <div className="grid grid-cols-2 gap-2" role="radiogroup">

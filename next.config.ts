@@ -16,6 +16,8 @@ function publicUrl() {
 const SITE_URL = publicUrl();
 
 const nextConfig: NextConfig = {
+  // The database driver loads at runtime; keep it out of the bundle.
+  serverExternalPackages: ["postgres"],
   env: SITE_URL ? { NEXT_PUBLIC_SITE_URL: SITE_URL } : {},
   async headers() {
     return [
